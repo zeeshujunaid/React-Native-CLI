@@ -35,8 +35,8 @@ const LoginScreen = () => {
       Alert.alert('Success', `Welcome back, ${user.email}!`)
       setEmail('')
       setPassword('')
+      navigation.navigate("MainApp")
 // In handleLogin and handleGoogleLogin functions:
-navigation.replace('Feed');
     } catch (error) {
       console.log('Login error:', error)
       switch (error.code) {
@@ -61,7 +61,7 @@ navigation.replace('Feed');
       const userCredential = await auth().signInWithCredential(googleCredential) // Sign in with credential
       const user = userCredential.user
       Alert.alert('Success', `Welcome back, ${user.email}!`)
-      navigation.replace('MainApp');
+      navigation.navigate("MainApp")
     } catch (error) {
       console.log('Google Login Error:', error)
       Alert.alert('Google Login Error', error.message)
@@ -96,7 +96,9 @@ navigation.replace('Feed');
       </View>
 
       <TouchableOpacity onPress={() => navigation.navigate('signup')}>
-        <Text style={{ marginTop: 20, color: 'blue', textAlign: 'center' }}>
+        <Text style={{ marginTop: 20, color: 'blue', textAlign: 'center' }}
+        onPress={()=>navigation.navigate('signup')}
+        >
           Don't have an account? Sign Up
         </Text>
       </TouchableOpacity>
