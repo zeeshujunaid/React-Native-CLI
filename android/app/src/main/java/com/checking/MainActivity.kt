@@ -1,4 +1,4 @@
-package com.checking
+package com.fbwork
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

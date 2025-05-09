@@ -1,4 +1,4 @@
-package com.checking
+package com.fbwork
 
 import android.app.Application
 import com.facebook.react.PackageList

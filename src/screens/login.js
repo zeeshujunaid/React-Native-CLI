@@ -1,40 +1,107 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  TouchableOpacity
+} from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import auth from '@react-native-firebase/auth'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
-function Login({ navigation }) {
+const LoginScreen = () => {
+  const navigation = useNavigation()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  // Configure Google SignIn
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: '49476995375-gko8935aoabfglgijlhhsip1gl58e2lv.apps.googleusercontent.com',
+    })
+  }, [])
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password')
+      return
+    }
+
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(email, password)
+      const user = userCredential.user
+      Alert.alert('Success', `Welcome back, ${user.email}!`)
+      setEmail('')
+      setPassword('')
+// In handleLogin and handleGoogleLogin functions:
+navigation.replace('Feed');
+    } catch (error) {
+      console.log('Login error:', error)
+      switch (error.code) {
+        case 'auth/user-not-found':
+          Alert.alert('User not found', 'Please check your email and try again.')
+          break
+        case 'auth/wrong-password':
+          Alert.alert('Incorrect password', 'Please check your password and try again.')
+          break
+        default:
+          Alert.alert('Login Error', error.message)
+          break
+      }
+    }
+  }
+
+  // Login with Google
+  const handleGoogleLogin = async () => {
+    try {
+      const { idToken } = await GoogleSignin.signIn() // Get ID Token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken) // Create Google Credential
+      const userCredential = await auth().signInWithCredential(googleCredential) // Sign in with credential
+      const user = userCredential.user
+      Alert.alert('Success', `Welcome back, ${user.email}!`)
+      navigation.replace('MainApp');
+    } catch (error) {
+      console.log('Google Login Error:', error)
+      Alert.alert('Google Login Error', error.message)
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Welcome Back!</Text>
-      <Text style={styles.subText}>This is the login page of your awesome app.</Text>
-      <Text style={styles.note}>Please use your credentials to continue.</Text>
-      <Button title="Click Me" onPress={() => navigation.navigate("MainApp")} />
-    </View>
-  );
-}
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3F8FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2E86DE',
-    marginBottom: 10,
-  },
-  subText: {
-    fontSize: 18,
-    color: '#34495E',
-    marginBottom: 8,
-  },
-  note: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    marginTop: 10,
-  },
-});
+    <View style={{ padding: 20 }}>
+      <Text style={{ fontSize: 20, marginBottom: 20 }}>Login Screen</Text>
 
-export default Login;
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        style={{ borderWidth: 1, marginVertical: 10, padding: 8 }}
+      />
+
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={{ borderWidth: 1, marginVertical: 10, padding: 8 }}
+      />
+
+      <Button title="Login" onPress={handleLogin} />
+
+      <View style={{ marginVertical: 10 }}>
+        <Button title="Login with Google" onPress={handleGoogleLogin} />
+      </View>
+
+      <TouchableOpacity onPress={() => navigation.navigate('signup')}>
+        <Text style={{ marginTop: 20, color: 'blue', textAlign: 'center' }}>
+          Don't have an account? Sign Up
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+export default LoginScreen
