@@ -7,8 +7,8 @@ import HomeScreen from '../screens/home';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => (
-  <Drawer.Navigator screenOptions={{ headerShown: true }}>
-    <Drawer.Screen name="Home" component={HomeScreen} />
+  <Drawer.Navigator screenOptions={{ headerShown: true }} initialRouteName="Home">
+    <Drawer.Screen name="Home" component={HomeScreen}/>
     {/* <Drawer.Screen name="Chat" component={ChatScreen} />
     <Drawer.Screen name="Settings" component={SettingsScreen} /> */}
   </Drawer.Navigator>

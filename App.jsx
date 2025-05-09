@@ -130,19 +130,21 @@
 
 // export default App;
 
-
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './src/navigation/appnavigator';
+import {AuthProvider} from './src/context/Authcontext';
+import { navigationRef } from './src/navigation/navigationRef';
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <AppNavigator />
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer ref={navigationRef}>
+        <AppNavigator />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
-
 
 // import React from 'react';
 // import { View, Text, StyleSheet } from 'react-native';
