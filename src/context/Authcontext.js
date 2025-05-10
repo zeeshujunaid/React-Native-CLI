@@ -11,31 +11,34 @@ export const AuthProvider = ({ children }) => {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (user) => {
-      console.log('Firebase user:', user);
-      if (user) {
-        setUser(user);
+    const unsubscribe = auth().onAuthStateChanged(async (firebaseUser) => {
+      console.log('Firebase user:', firebaseUser);
 
+      if (firebaseUser) {
+        setUser(firebaseUser);
+
+        // Save user to AsyncStorage
         await AsyncStorage.setItem('user', JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
         }));
 
         const setupCompleted = await AsyncStorage.getItem('userSetupCompleted');
-        console.log('User setup completed flag:', setupCompleted);
+        console.log('Setup completed:', setupCompleted);
 
-        if (setupCompleted === 'true') {
-          navigate('MainApp');
-        } else {
+        if (setupCompleted !== 'true') {
+          console.log('User setup not completed');
           navigate('SetProfile');
+        } else {
+          console.log('User setup completed');
+          navigate('MainApp');
         }
-
       } else {
+        // Logout logic
         setUser(null);
-        await AsyncStorage.removeItem('user');
-        await AsyncStorage.removeItem('userSetupCompleted');
+        await AsyncStorage.multiRemove(['user', 'userSetupCompleted']);
         navigate('Login');
       }
 

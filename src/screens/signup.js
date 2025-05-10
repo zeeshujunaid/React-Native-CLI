@@ -8,9 +8,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
+import { firebase } from '@react-native-firebase/app';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {setReactNativeAsyncStorage} from '@react-native-firebase/app';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignupScreen = ({navigation}) => {
   // const navigation = useNavigation()
@@ -40,6 +42,7 @@ const SignupScreen = ({navigation}) => {
     }
   };
 
+
   const handleSignup = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password');
@@ -47,21 +50,29 @@ const SignupScreen = ({navigation}) => {
     }
 
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(
-        email,
-        password,
-      );
+      // Step 1: Set flag early so auth listener catches it
+      await AsyncStorage.setItem('userSetupCompleted', 'false');
+  
+      // Step 2: Create user in Firebase Auth
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
+  
+      // Step 3: Save user to Firestore
+      await firestore().collection('users').doc(user.uid).set({
+        email: user.email,
+      });
+  
       Alert.alert('Success', `Welcome, ${user.email}!`);
       setEmail('');
       setPassword('');
-      await AsyncStorage.setItem('userSetupCompleted', 'false');
-      navigation.navigate('SetProfile');
+      
     } catch (error) {
-      console.log(error);
+      console.log('Signup Error:', error);
       Alert.alert('Signup Error', error.message);
     }
   };
+  
+
 
   return (
     <View style={{padding: 20}}>

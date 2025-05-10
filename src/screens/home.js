@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import Navbar from '../components/navbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
@@ -16,6 +17,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
+      <Navbar />
       <Text style={styles.text}>This is the Home Page</Text>
       <Button title="Sign Out" onPress={handleSignOut} />
     </View>
@@ -30,6 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center',     
     backgroundColor: '#ffffff',
+    paddingTop: 60,
   },
   text: {
     fontSize: 20,
